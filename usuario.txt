@@ -1,0 +1,2 @@
+Sergio Diogo Antonio;80;2000.0;true;123.567.891-01;sergio@gmail.com;(14)99609038;Free;17013-104;Rua M. Salgado da Rocha - 123
+Viviane Salzedo;100;8000.0;true;124.807.091-00;viviane@gmail.com;(14)998078038;Free;17015-94;Rua General. Luiz Cunha - 321
