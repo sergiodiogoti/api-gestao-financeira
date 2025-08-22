@@ -8,9 +8,11 @@ import br.edu.infinet.sergioantonioapi.model.domain.Usuario;
 import br.edu.infinet.sergioantonioapi.model.service.UsuarioService;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 
+@Order(1)
 @Component
 public class UsuarioLoader implements ApplicationRunner {
 	

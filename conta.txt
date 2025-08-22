@@ -1,0 +1,3 @@
+Conta Corrente Bradesco;CORRENTE;2500.00;true;1
+Conta Poupança Caixa;POUPANCA;1200.00;false;1
+Carteira Física;CARTEIRA;300.00;false;1

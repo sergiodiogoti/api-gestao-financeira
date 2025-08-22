@@ -157,6 +157,158 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "conta",
+			"item": [
+				{
+					"name": "obterPorId",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/contas/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"contas",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "obterLista",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/contas",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"contas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "incluir",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"nome\": \"Conta Corrente Santander\",\r\n  \"tipo\": \"CORRENTE\",\r\n  \"saldoInicial\": 1200.00,\r\n  \"principal\": false,\r\n  \"usuario\": {\r\n    \"id\": 1\r\n  }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/contas",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"contas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "alterar",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"nome\": \"Conta Corrente Santander\",\r\n  \"tipo\": \"CORRENTE\",\r\n  \"saldoInicial\": 1200.00,\r\n  \"principal\": false,\r\n  \"usuario\": {\r\n    \"id\": 2\r\n  }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/contas/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"contas",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "excluir",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nome\": \"Vinicius Cesar Vianna\",\r\n    \"email\": \"viniciuscesar@vianna.com\",\r\n    \"telefone\": \"3434343434\",\r\n    \"matricula\": 9987,\r\n    \"salario\": 1001.0,\r\n    \"ehAtivo\": true,\r\n    \"endereco\": {\r\n        \"cep\": \"22233334\",\r\n        \"localidade\": \"São Paulo\"\r\n    }\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/contas/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"contas",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "principal",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/contas/1/principal",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"contas",
+								"1",
+								"principal"
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	]
 }
