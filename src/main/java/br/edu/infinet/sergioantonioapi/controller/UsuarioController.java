@@ -2,6 +2,8 @@ package br.edu.infinet.sergioantonioapi.controller;
 
 import br.edu.infinet.sergioantonioapi.model.domain.Usuario;
 import br.edu.infinet.sergioantonioapi.model.service.UsuarioService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -26,32 +28,41 @@ public class UsuarioController {
 	}
 	
 	@PostMapping
-	public Usuario incluir(@RequestBody Usuario usuario) {
-		return usuarioService.incluir(usuario);
+	public ResponseEntity<Usuario> incluir(@RequestBody Usuario usuario) {
+        Usuario novoUsuario = usuarioService.incluir(usuario);
+		return ResponseEntity.status(HttpStatus.CREATED).body(novoUsuario);
 	}
 		
 	@PutMapping(value = "/{id}")
-	public Usuario alterar(@PathVariable Integer id, @RequestBody Usuario usuario) {
-		return usuarioService.alterar(id, usuario);
+	public ResponseEntity<Usuario> alterar(@PathVariable Integer id, @RequestBody Usuario usuario) {
+		Usuario usuarioAlterado = usuarioService.alterar(id, usuario);
+		return ResponseEntity.ok(usuarioAlterado);
 	}
 	
 	@DeleteMapping(value = "/{id}")
-	public void excluir(@PathVariable Integer id) {
+	public ResponseEntity<Void> excluir(@PathVariable Integer id) {
 		usuarioService.excluir(id);
+		return ResponseEntity.noContent().build();
 	}
 	
 	@PatchMapping(value = "/{id}/inativar")
-	public Usuario inativar(@PathVariable Integer id) {
-		return usuarioService.inativar(id);
+	public ResponseEntity<Usuario> inativar(@PathVariable Integer id) {
+		Usuario usuaurio =usuarioService.inativar(id);
+		return ResponseEntity.ok(usuaurio);
 	}
 	
 	@GetMapping
-	public List<Usuario> obterLista(){
-		return usuarioService.obterLista();
+	public ResponseEntity<List<Usuario>> obterLista(){
+		List<Usuario> lista = usuarioService.obterLista();
+		if(lista.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+		return ResponseEntity.ok(lista);
 	}
 	
 	@GetMapping(value = "/{id}")
-	public Usuario obterPorId(@PathVariable Integer id) {
-		return usuarioService.obterPorId(id);
+	public ResponseEntity<Usuario> obterPorId(@PathVariable Integer id) {
+		Usuario usuario = usuarioService.obterPorId(id);
+		return ResponseEntity.ok(usuario);
 	}	
 }

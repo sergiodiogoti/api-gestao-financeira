@@ -1,3 +1,3 @@
-Sergio Diogo Antonio;80;2000.0;true;123.567.891-01;sergio@gmail.com;(14)99609038;Free;17013-104;Rua M. Salgado da Rocha - 123
-Viviane Salzedo;100;8000.0;true;124.807.091-00;viviane@gmail.com;(14)998078038;Free;17015-94;Rua General. Luiz Cunha - 321
-Flavio Bonfim Silva;100;8000.0;true;124.807.091-00;flavio@gmail.com;(14)996076072;Free;17018-81;Rua Alamenda São Luiz da Cunha - 680
+Sergio Diogo Antonio;80;2000.0;true;123.567.891-01;sergio@gmail.com;(14)99609038;Free;17013-104;Rua M. Salgado da Rocha - 123;Vila Flores;São Paulo;SP;Bauru
+Viviane Salzedo;100;8000.0;true;124.807.091-00;viviane@gmail.com;(14)998078038;Free;17015-94;Rua General. Luiz Cunha - 321;Vila Falcão;São Paulo;SP;Bauru
+Flavio Bonfim Silva;100;8000.0;true;124.807.091-00;flavio@gmail.com;(14)996076072;Free;17018-81;Rua Alamenda São Luiz da Cunha - 680;Vila Cardia;Rio de Janeiro;RJ;Duque de Caxias

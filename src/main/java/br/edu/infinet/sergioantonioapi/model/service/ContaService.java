@@ -4,26 +4,22 @@ import br.edu.infinet.sergioantonioapi.model.domain.Conta;
 import br.edu.infinet.sergioantonioapi.model.domain.Usuario;
 import br.edu.infinet.sergioantonioapi.model.domain.exceptions.ContaInvalidaException;
 import br.edu.infinet.sergioantonioapi.model.domain.exceptions.ContaNaoEncontradaException;
+import br.edu.infinet.sergioantonioapi.model.repository.ContaRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
-
 
 @Service
 public class ContaService implements CrudService<Conta, Integer> {
 
-	private final Map<Integer, Conta> mapa = new ConcurrentHashMap<Integer, Conta>();
-	private final AtomicInteger nextId = new AtomicInteger(1);
+
 	private final UsuarioService usuarioService;
+	private final ContaRepository contaRepository;
 
-	public ContaService(UsuarioService usuarioService) {
+	public ContaService(UsuarioService usuarioService, ContaRepository contaRepository) {
 		this.usuarioService = usuarioService;
+		this.contaRepository = contaRepository;
 	}
-
 
 	private void validar(Conta conta) {
 		if(conta == null) {
@@ -39,97 +35,69 @@ public class ContaService implements CrudService<Conta, Integer> {
 			throw new ContaInvalidaException("O tipo de conta é uma informação obrigatória!");
 		}
 	}
-	
+
 	@Override
+	@Transactional
 	public Conta incluir(Conta conta) {
-		
 		validar(conta);
-		
 		if(conta.getId() != null && conta.getId() != 0) {
 			throw new IllegalArgumentException("Uma nova conta não pode ter um ID na inclusão!");
 		}
-
 		if(conta.getId() != null && conta.getSaldoInicial() < 0) {
 			throw new IllegalArgumentException("Uma nova conta não pode ter saldo negativo");
 		}
-
-		conta.setId(nextId.getAndIncrement());
-
 		Usuario usuario = usuarioService.obterPorId(conta.getUsuario().getId());
 		conta.setUsuario(usuario);
-		
-		mapa.put(conta.getId(), conta);
-		
-		return conta;
+
+		return contaRepository.save(conta);
 	}
 
 	@Override
+	@Transactional
 	public Conta alterar(Integer id, Conta conta) {
-
 		if(id == null || id == 0) {
 			throw new IllegalArgumentException("O ID para alteração não pode ser nulo/zero!");			
 		}
-		
 		validar(conta);
-		
 		obterPorId(id);
-		
-		conta.setId(id);
-
 		Usuario usuario = usuarioService.obterPorId(conta.getUsuario().getId());
 		conta.setUsuario(usuario);
+		conta.setId(id);
 
-		mapa.put(conta.getId(), conta);
-		
-		return conta;
+		return contaRepository.save(conta);
 	}
 
 	@Override
+	@Transactional
 	public void excluir(Integer id) {
 		if(id == null || id == 0) {
 			throw new IllegalArgumentException("O ID para exclusão não pode ser nulo/zero!");			
 		}
-		
-		if(!mapa.containsKey(id)) {
-			throw new ContaNaoEncontradaException("A conta com ID " + id + " não foi encontrado!");
-		}
-
-		mapa.remove(id);
+		obterPorId(id);
+		contaRepository.deleteById(id);
 	}
 
+	@Transactional
 	public Conta marcarComoPrincipal(Integer id) {
-
 		if(id == null || id == 0) {
 			throw new IllegalArgumentException("O ID para marcar a conta como principal não pode ser nulo/zero!");
 		}
-		
 		Conta conta = obterPorId(id);
-		
 		if(!conta.isPrincipal()) {
 			conta.setPrincipal(true);
-		}else{
-			return conta;
+			contaRepository.save(conta);
 		}
-		mapa.put(conta.getId(), conta);
 		return conta;
 	}
 
-
 	@Override
 	public List<Conta> obterLista() {
-		
-		return new ArrayList<Conta>(mapa.values());
+		return contaRepository.findAll();
 	}
 
 	@Override
 	public Conta obterPorId(Integer id) {
-
-		Conta conta = mapa.get(id);
-		
-		if(conta == null) {
-			throw new IllegalArgumentException("Imposível obter a conta pelo ID " + id);
-		}
-		
-		return conta;
+		return contaRepository.findById(id)
+				.orElseThrow(() -> new ContaNaoEncontradaException("A Conta com ID " + id + " não foi encontrada!"));
 	}
 } 

@@ -1,13 +1,24 @@
  package br.edu.infinet.sergioantonioapi.model.domain;
 
+ import jakarta.persistence.*;
 
+ @Entity
  public class Conta {
 
+     @Id
+     @GeneratedValue(strategy = GenerationType.IDENTITY)
      private Integer id;
+
      private String nome;
+
      private String tipo; // CORRENTE, POUPANCA, CARTEIRA
+
      private Double saldoInicial;
+
      private boolean principal;
+
+     @ManyToOne
+     @JoinColumn(name = "usuario_id")
      private Usuario usuario;
 
      public Integer getId() {

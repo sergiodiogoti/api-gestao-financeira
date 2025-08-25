@@ -1,12 +1,24 @@
 package br.edu.infinet.sergioantonioapi.model.domain;
 
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+
+@Entity
 public class Usuario extends Pessoa {
 
-	private int pontuacaoCredito ;
+	private int pontuacaoCredito;
+
 	private double rendaMensal;
+
 	private String perfil;
+
 	private boolean ativo;
+
+	@ManyToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "endereco_id")
 	private Endereco endereco;
 
 	@Override

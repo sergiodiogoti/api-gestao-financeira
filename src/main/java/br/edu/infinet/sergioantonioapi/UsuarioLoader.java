@@ -38,8 +38,12 @@ public class UsuarioLoader implements ApplicationRunner {
 			
 			Endereco endereco = new Endereco();
 			endereco.setCep(campos[8]);
-			endereco.setLocalidade(campos[9]);
-			
+			endereco.setLogradouro(campos[9]);
+			endereco.setBairro(campos[10]);
+			endereco.setEstado(campos[11]);
+			endereco.setUf(campos[12]);
+			endereco.setLocalidade(campos[13]);
+
 			Usuario usuario = new Usuario();
 			usuario.setNome(campos[0]);
 			usuario.setPontuacaoCredito(Integer.valueOf(campos[1]));
