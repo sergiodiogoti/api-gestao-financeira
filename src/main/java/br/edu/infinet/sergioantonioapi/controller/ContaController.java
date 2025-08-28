@@ -14,7 +14,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/contas")
-@Validated
 public class ContaController {
 
 	private final ContaService contaService;
