@@ -52,3 +52,49 @@ O projeto utiliza **H2 Database**, um banco em memória ideal para desenvolvimen
       spring.h2.console.enabled=true
       spring.h2.console.path=/h2-console
 
+    
+---
+
+## 📑 Endpoints disponíveis
+
+### Usuário
+| Método | URL | Descrição |
+|--------|-----|-----------|
+| GET | `/usuarios` | Lista todos os usuários |
+| GET | `/usuarios/{id}` | Consulta usuário por ID |
+| POST | `/usuarios` | Cria um novo usuário |
+| PUT | `/usuarios/{id}` | Atualiza um usuário existente |
+| DELETE | `/usuarios/{id}` | Exclui usuário |
+| PATCH | `/usuarios/inativar/{id}` | Inativa usuário |
+| GET | `/usuarios/perfil/{perfil}` | Busca usuários por perfil (ignore case) |
+| GET | `/usuarios/renda?min=X&max=Y` | Busca usuários por faixa de renda |
+
+### Conta
+| Método | URL | Descrição |
+|--------|-----|-----------|
+| GET | `/contas` | Lista todas as contas |
+| GET | `/contas/{id}` | Consulta conta por ID |
+| POST | `/contas` | Cria nova conta |
+| PUT | `/contas/{id}` | Atualiza conta existente |
+| DELETE | `/contas/{id}` | Exclui conta |
+| PATCH | `/contas/marcar-principal/{id}` | Marca conta como principal |
+| GET | `/contas/cpf/{cpf}/tipo/{tipo}` | Busca contas por CPF e tipo |
+| GET | `/contas/cpf/{cpf}/saldo-maior/{valor}` | Busca contas com saldo maior que valor |
+
+---
+
+## 📄 Arquivos de dados (Loaders)
+- `dataFile/usuario.txt`  
+- `dataFile/conta.txt`
+
+
+---
+
+## ⚡ Instruções para rodar
+1. Clonar o repositório:
+```bash
+git clone <URL_DO_REPOSITORIO>
+
+mvn spring-boot:run
+
+
