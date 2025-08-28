@@ -1,12 +1,15 @@
 package br.edu.infinet.sergioantonioapi.model.service;
 
 import java.util.List;
+
+import br.edu.infinet.sergioantonioapi.model.domain.exceptions.ResourceInvalidException;
+import br.edu.infinet.sergioantonioapi.model.domain.exceptions.ResourceNotFoundException;
 import br.edu.infinet.sergioantonioapi.model.domain.Usuario;
-import br.edu.infinet.sergioantonioapi.model.domain.exceptions.UsuarioInvalidoException;
-import br.edu.infinet.sergioantonioapi.model.domain.exceptions.UsuariorNaoEncontradoException;
 import br.edu.infinet.sergioantonioapi.model.repository.UsuarioRepository;
-import jakarta.transaction.Transactional;
+import br.edu.infinet.sergioantonioapi.model.util.ConstanteUtil;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UsuarioService implements CrudService<Usuario, Integer> {
@@ -18,22 +21,17 @@ public class UsuarioService implements CrudService<Usuario, Integer> {
 		this.usuarioRepository = usuarioRepository;
 	}
 
-	private void validar(Usuario usuario) {
-		if(usuario == null) {
-			throw new IllegalArgumentException("O usuario não pode estar nulo!");
-		}
-		if(usuario.getNome() == null || usuario.getNome().trim().isEmpty()) {
-			throw new UsuarioInvalidoException("O nome do usuario é uma informação obrigatória!");
-		}		
-	}
 
 	@Override
 	@Transactional
 	public Usuario incluir(Usuario usuario) {
-		validar(usuario);
 		if(usuario.getId() != null && usuario.getId() != 0) {
-			throw new IllegalArgumentException("Um novo usuario não pode ter um ID na inclusão!");			
+			throw new ResourceInvalidException(ConstanteUtil.ERRO_ID_REGISTRO_NOVO);
 		}
+		usuarioRepository.findByCpf(usuario.getCpf())
+				.ifPresent(u -> {
+					throw new DataIntegrityViolationException(ConstanteUtil.ERRO_USUARIO_JA_EXISTE);
+		});
 		return usuarioRepository.save(usuario);
 	}
 
@@ -42,9 +40,8 @@ public class UsuarioService implements CrudService<Usuario, Integer> {
 	public Usuario alterar(Integer id, Usuario usuario) {
 
 		if(id == null || id == 0) {
-			throw new IllegalArgumentException("O ID para alteração não pode ser nulo/zero!");			
+			throw new ResourceInvalidException(ConstanteUtil.ERRO_ALTERACAO_ID_INVALIDO);
 		}
-		validar(usuario);
 		obterPorId(id);
 		usuario.setId(id);
 		return usuarioRepository.save(usuario);
@@ -54,10 +51,9 @@ public class UsuarioService implements CrudService<Usuario, Integer> {
 	@Transactional
 	public void excluir(Integer id)  {
 		if(id == null || id == 0) {
-			throw new IllegalArgumentException("O ID para exclusão não pode ser nulo/zero!");			
+			throw new ResourceInvalidException(ConstanteUtil.ERRO_EXCLUSAO_ID_INVALIDO);
 		}
-		Usuario usuario = usuarioRepository.findById(id)
-				.orElseThrow(() -> new UsuariorNaoEncontradoException("O usuario com ID " + id + " não foi encontrado!"));
+		Usuario usuario = obterPorId(id);
 		usuarioRepository.delete(usuario);
 	}
 
@@ -65,11 +61,10 @@ public class UsuarioService implements CrudService<Usuario, Integer> {
 	public Usuario inativar(Integer id) {
 
 		if(id == null || id == 0) {
-			throw new IllegalArgumentException("O ID para inativação não pode ser nulo/zero!");			
+			throw new ResourceInvalidException(ConstanteUtil.ERRO_INATIVACAO_ID_INVALIDO);
 		}
 		Usuario usuario = obterPorId(id);
 		if(!usuario.isAtivo()) {
-			System.out.println("Usuario " + usuario.getNome() + " já está inativo!");
 			return usuario;
 		}
 		usuario.setAtivo(false);
@@ -77,13 +72,53 @@ public class UsuarioService implements CrudService<Usuario, Integer> {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<Usuario> obterLista() {
-		return usuarioRepository.findAll();
+		List<Usuario> lista = usuarioRepository.findAll();
+		if(lista.isEmpty()){
+			throw new ResourceNotFoundException(ConstanteUtil.MSG_NENHUM_USUARIO_ENCONTRADO);
+		}
+		return lista;
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public Usuario obterPorId(Integer id) {
+		if(id == null || id == 0) {
+			throw new ResourceInvalidException(ConstanteUtil.ERRO_BUSCA_ID_INVALIDO);
+		}
         return usuarioRepository.findById(id)
-				.orElseThrow(() -> new UsuariorNaoEncontradoException("O usuario com ID " + id + " não foi encontrado!"));
+				.orElseThrow(() -> new ResourceNotFoundException(ConstanteUtil.MSG_NENHUM_USUARIO_ENCONTRADO_PARA_ID_INFORMADO));
 	}
+
+	@Transactional(readOnly = true)
+	public Usuario obterPorCpf(String cpf) {
+		if (cpf == null) {
+			throw new ResourceInvalidException(ConstanteUtil.ERRO_BUSCA_CPF_INVALIDO);
+		}
+		return usuarioRepository.findByCpf(cpf)
+				.orElseThrow(() -> new ResourceNotFoundException(ConstanteUtil.MSG_NENHUM_USUARIO_ENCONTRADO_PARA_CPF_INFORMADO));
+	}
+
+	@Transactional(readOnly = true)
+	public List<Usuario> obterPorPerfil(String perfil) {
+		List<Usuario> lista = usuarioRepository.findByPerfilIgnoreCase(perfil);
+		if (lista.isEmpty()) {
+			throw new ResourceNotFoundException(ConstanteUtil.MSG_NENHUM_USUARIO_ENCONTRADO_PARA_O_PERFIL);
+		}
+		return lista;
+	}
+
+	@Transactional(readOnly = true)
+	public List<Usuario> obterPorRendaEntre(double min, double max) {
+		if (min < 0 || max < 0) {
+			throw new ResourceInvalidException(ConstanteUtil.ERRO_RENDA_INVALIDA);
+		}
+		List<Usuario> lista = usuarioRepository.findByRendaMensalBetween(min, max);
+		if (lista.isEmpty()) {
+			throw new ResourceNotFoundException(ConstanteUtil.MSG_NENHUM_USUARIO_ENCONTRADO_PARA_A_RENDA);
+		}
+		return lista;
+	}
+
 } 

@@ -1,6 +1,13 @@
  package br.edu.infinet.sergioantonioapi.model.domain;
 
+ import br.edu.infinet.sergioantonioapi.model.domain.enums.Instituicao;
+ import br.edu.infinet.sergioantonioapi.model.domain.enums.TipoConta;
  import jakarta.persistence.*;
+ import jakarta.validation.Valid;
+ import jakarta.validation.constraints.Min;
+ import jakarta.validation.constraints.NotBlank;
+ import jakarta.validation.constraints.NotNull;
+ import jakarta.validation.constraints.Size;
 
  @Entity
  public class Conta {
@@ -9,16 +16,27 @@
      @GeneratedValue(strategy = GenerationType.IDENTITY)
      private Integer id;
 
+     @NotBlank(message = "O nome é obrigatório.")
+     @Size(min = 3, max = 50, message = "O nome deve ter entre 3 e 50 caracteres.")
      private String nome;
 
-     private String tipo; // CORRENTE, POUPANCA, CARTEIRA
+     @NotNull(message = "O tipo da conta é obrigatório.")
+     @Enumerated(EnumType.STRING)
+     private TipoConta tipo;
 
-     private Double saldoInicial;
+     @NotNull(message = "A Instituição da conta é obrigatória.")
+     @Enumerated(EnumType.STRING)
+     private Instituicao instituicao;
+
+     @NotNull(message = "O Saldo é obrigatório.")
+     @Min(value = 1, message = "O Saldo deve ser um número positivo.")
+     private Double saldo;
 
      private boolean principal;
 
-     @ManyToOne
-     @JoinColumn(name = "usuario_id")
+     @ManyToOne(fetch = FetchType.LAZY, optional = false)
+     @JoinColumn(name = "usuario_id", nullable = false)
+     @Valid
      private Usuario usuario;
 
      public Integer getId() {
@@ -37,20 +55,28 @@
          this.nome = nome;
      }
 
-     public String getTipo() {
+     public TipoConta getTipo() {
          return tipo;
      }
 
-     public void setTipo(String tipo) {
+     public void setTipo(TipoConta tipo) {
          this.tipo = tipo;
      }
 
-     public Double getSaldoInicial() {
-         return saldoInicial;
+     public Instituicao getInstituicao() {
+         return instituicao;
      }
 
-     public void setSaldoInicial(Double saldoInicial) {
-         this.saldoInicial = saldoInicial;
+     public void setInstituicao(Instituicao instituicao) {
+         this.instituicao = instituicao;
+     }
+
+     public Double getSaldo() {
+         return saldo;
+     }
+
+     public void setSaldo(Double saldo) {
+         this.saldo = saldo;
      }
 
      public boolean isPrincipal() {
@@ -71,7 +97,7 @@
 
      @Override
      public String toString() {
-         return super.toString() + String.format(" - %s - Tipo de Conta: %s - Saldo: %.2f - usuario: %s - Principal: %s ",
-                 nome, tipo, saldoInicial, usuario != null? usuario.getNome() : null, principal ? "Sim" : "Não");
+         return super.toString() + String.format(" - %s - Tipo de Conta: %s - Saldo: %.2f - Principal: %s ",
+                 nome, tipo, saldo, principal ? "Sim" : "Não");
      }
  }

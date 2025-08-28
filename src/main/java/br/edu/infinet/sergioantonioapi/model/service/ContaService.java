@@ -2,11 +2,14 @@ package br.edu.infinet.sergioantonioapi.model.service;
 
 import br.edu.infinet.sergioantonioapi.model.domain.Conta;
 import br.edu.infinet.sergioantonioapi.model.domain.Usuario;
-import br.edu.infinet.sergioantonioapi.model.domain.exceptions.ContaInvalidaException;
-import br.edu.infinet.sergioantonioapi.model.domain.exceptions.ContaNaoEncontradaException;
+import br.edu.infinet.sergioantonioapi.model.domain.enums.TipoConta;
+import br.edu.infinet.sergioantonioapi.model.domain.exceptions.ResourceInvalidException;
+import br.edu.infinet.sergioantonioapi.model.domain.exceptions.ResourceNotFoundException;
 import br.edu.infinet.sergioantonioapi.model.repository.ContaRepository;
-import jakarta.transaction.Transactional;
+import br.edu.infinet.sergioantonioapi.model.util.ConstanteUtil;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 @Service
@@ -21,34 +24,17 @@ public class ContaService implements CrudService<Conta, Integer> {
 		this.contaRepository = contaRepository;
 	}
 
-	private void validar(Conta conta) {
-		if(conta == null) {
-			throw new IllegalArgumentException("A conta não pode estar nula!");
-		}
-		if(conta.getNome() == null || conta.getNome().trim().isEmpty()) {
-			throw new ContaInvalidaException("O nome do conta é uma informação obrigatória!");
-		}
-		if(conta.getUsuario() == null || conta.getUsuario().getId() == null) {
-			throw new ContaInvalidaException("O id do usuario é um campo obrigatório!");
-		}
-		if(conta.getTipo() == null || conta.getTipo().trim().isEmpty()) {
-			throw new ContaInvalidaException("O tipo de conta é uma informação obrigatória!");
-		}
-	}
-
 	@Override
 	@Transactional
 	public Conta incluir(Conta conta) {
-		validar(conta);
 		if(conta.getId() != null && conta.getId() != 0) {
-			throw new IllegalArgumentException("Uma nova conta não pode ter um ID na inclusão!");
+			throw new ResourceInvalidException(ConstanteUtil.ERRO_ID_REGISTRO_NOVO);
 		}
-		if(conta.getId() != null && conta.getSaldoInicial() < 0) {
-			throw new IllegalArgumentException("Uma nova conta não pode ter saldo negativo");
+		if(conta.getId() != null && conta.getSaldo() < 0) {
+			throw new ResourceInvalidException(ConstanteUtil.ERRO_CONTA_NOVA_SALDO_NEGATIVO);
 		}
 		Usuario usuario = usuarioService.obterPorId(conta.getUsuario().getId());
 		conta.setUsuario(usuario);
-
 		return contaRepository.save(conta);
 	}
 
@@ -56,9 +42,8 @@ public class ContaService implements CrudService<Conta, Integer> {
 	@Transactional
 	public Conta alterar(Integer id, Conta conta) {
 		if(id == null || id == 0) {
-			throw new IllegalArgumentException("O ID para alteração não pode ser nulo/zero!");			
+			throw new ResourceInvalidException(ConstanteUtil.ERRO_ALTERACAO_ID_INVALIDO);
 		}
-		validar(conta);
 		obterPorId(id);
 		Usuario usuario = usuarioService.obterPorId(conta.getUsuario().getId());
 		conta.setUsuario(usuario);
@@ -71,7 +56,7 @@ public class ContaService implements CrudService<Conta, Integer> {
 	@Transactional
 	public void excluir(Integer id) {
 		if(id == null || id == 0) {
-			throw new IllegalArgumentException("O ID para exclusão não pode ser nulo/zero!");			
+			throw new ResourceInvalidException(ConstanteUtil.ERRO_EXCLUSAO_ID_INVALIDO);
 		}
 		obterPorId(id);
 		contaRepository.deleteById(id);
@@ -80,7 +65,7 @@ public class ContaService implements CrudService<Conta, Integer> {
 	@Transactional
 	public Conta marcarComoPrincipal(Integer id) {
 		if(id == null || id == 0) {
-			throw new IllegalArgumentException("O ID para marcar a conta como principal não pode ser nulo/zero!");
+			throw new ResourceInvalidException(ConstanteUtil.ERRO_ID_MARCAR_CONTA_PRINCIPAL);
 		}
 		Conta conta = obterPorId(id);
 		if(!conta.isPrincipal()) {
@@ -91,13 +76,40 @@ public class ContaService implements CrudService<Conta, Integer> {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<Conta> obterLista() {
-		return contaRepository.findAll();
+		List<Conta> lista = contaRepository.findAll();
+		if(lista.isEmpty()){
+			throw new ResourceNotFoundException(ConstanteUtil.MSG_NENHUMA_CONTA_ENCONTRADA);
+		}
+		return lista;
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public Conta obterPorId(Integer id) {
+		if(id == null || id == 0) {
+			throw new ResourceInvalidException(ConstanteUtil.ERRO_BUSCA_ID_INVALIDO);
+		}
 		return contaRepository.findById(id)
-				.orElseThrow(() -> new ContaNaoEncontradaException("A Conta com ID " + id + " não foi encontrada!"));
+				.orElseThrow(() -> new ResourceNotFoundException(ConstanteUtil.MSG_NENHUMA_CONTA_ENCONTRADA_PARA_ID_INFORMADO));
+	}
+
+	@Transactional(readOnly = true)
+	public List<Conta> obterPorCpfETipo(String cpf, TipoConta tipo) {
+		List<Conta> lista = contaRepository.findByUsuarioCpfAndTipo(cpf, tipo);
+		if(lista.isEmpty()){
+			throw new ResourceNotFoundException(ConstanteUtil.MSG_NENHUMA_CONTA_ENCONTRADA_PARA_CPF_E_TIPO_INFORMADO);
+		}
+		return lista;
+	}
+
+	@Transactional(readOnly = true)
+	public List<Conta> obterPorSaldoMaiorQue(String cpf, Double valor) {
+		List<Conta> lista = contaRepository.findByUsuarioCpfAndSaldoGreaterThan(cpf, valor);
+		if(lista.isEmpty()){
+			throw new ResourceNotFoundException(ConstanteUtil.MSG_NAO_HA_CONTAS_COM_SALDO_MAIOR_QUE_O_VALOR_INFORMADO);
+		}
+		return lista;
 	}
 } 

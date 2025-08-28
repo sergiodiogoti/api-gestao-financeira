@@ -1,9 +1,7 @@
 package br.edu.infinet.sergioantonioapi.model.domain;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 
 @MappedSuperclass
 public abstract class Pessoa {
@@ -12,15 +10,23 @@ public abstract class Pessoa {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
+	@NotBlank(message = "O nome é obrigatório.")
+	@Size(min = 3, max = 50, message = "O nome deve ter entre 3 e 50 caracteres.")
 	private String nome;
 
+	@NotBlank(message = "O e-mail é obrigatório.")
+	@Email(message = "O e-mail está inválido.")
 	private String email;
 
+	@NotBlank(message = "O CPF é obrigatório.")
+	@Pattern(regexp = "\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}", message = "CPF inválido. Use o formato XXX.XXX.XXX-XX.")
+	@Column(unique = true, nullable = false)
 	private String cpf;
 
+	@NotBlank(message = "O telefone é obrigatório.") // NOVO: Validação para telefone não vazio
+	@Pattern(regexp = "\\(?\\d{2}\\)?\\s?\\d{4,5}-?\\d{4}", message = "Telefone inválido. Use o formato (XX) XXXXX-XXXX ou (XX) XXXX-XXXX.")
 	private String telefone;
-	
-	//TODO Criação do construtor de pessoa com nome, email, cpf e telefone
+
 	
 	@Override
 	public String toString() {
